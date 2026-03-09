@@ -1,0 +1,118 @@
+"use client"
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
+import { Lock, Phone, ArrowRight, ShieldCheck } from 'lucide-react'
+
+export default function CombinedLogin() {
+  const [phone, setPhone] = useState('')
+  const [password, setPassword] = useState('')
+  const [isPasswordMode, setIsPasswordMode] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  const handleLogin = async () => {
+    setLoading(true)
+    const cleanPhone = phone.replace(/^0+/, '')
+    const virtualEmail = `${cleanPhone}@bankak-swap.com`
+
+    try {
+      if (isPasswordMode) {
+        // تسجيل دخول مباشر بالرقم (كإيميل) وكلمة المرور
+        const { error } = await supabase.auth.signInWithPassword({
+          email: virtualEmail,
+          password: password,
+        })
+        if (error) throw error
+        router.push('/requests') // توجه مباشرة للطلبات
+      } else {
+        // الطريقة العادية: إنشاء حساب وتوجيه للواتساب
+        const tempPassword = 'Password123!'
+        const code = Math.floor(100000 + Math.random() * 900000).toString()
+
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: virtualEmail,
+          password: tempPassword,
+        })
+
+        if (!signUpError || signUpError.message.includes('already registered')) {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            await supabase.from('profiles').upsert({
+              id: user.id,
+              phone_number: `249${cleanPhone}`,
+              verification_code: code,
+              verified: false
+            })
+          }
+          window.open(`https://wa.me/249XXXXXXXXX?text=كود تفعيل حسابي: ${code}`, '_blank')
+          router.push('/verify-waiting')
+        } else {
+          throw signUpError
+        }
+      }
+    } catch (err) {
+      alert("خطأ: " + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white p-6 flex flex-col justify-center">
+      <div className="max-w-md mx-auto w-full space-y-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-extrabold text-orange-500 mb-2 italic">BANKAK SWAP</h1>
+          <p className="text-zinc-500">مرحباً بك مجدداً</p>
+        </div>
+
+        <div className="bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800 space-y-4">
+          {/* حقل رقم الهاتف */}
+          <div className="space-y-2">
+            <label className="text-xs text-zinc-500 ml-2">رقم الهاتف</label>
+            <div className="relative">
+              <span className="absolute left-4 top-4 text-zinc-500">+249</span>
+              <input 
+                type="tel" 
+                placeholder="9XXXXXXXX" 
+                className="w-full bg-black p-4 pl-16 rounded-2xl border border-zinc-800 focus:border-orange-500 outline-none transition-all font-mono"
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* حقل كلمة المرور - يظهر فقط في وضع الباسورد */}
+          {isPasswordMode && (
+            <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+              <label className="text-xs text-zinc-500 ml-2">كلمة المرور</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-4 text-zinc-500" size={18} />
+                <input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  className="w-full bg-black p-4 pl-12 rounded-2xl border border-zinc-800 focus:border-orange-500 outline-none transition-all"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          <button 
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full bg-white text-black font-black py-5 rounded-2xl transition-all flex items-center justify-center gap-2 text-lg active:scale-95"
+          >
+            {loading ? "جاري المعالجة..." : isPasswordMode ? "دخول مباشر" : "تفعيل عبر واتساب"}
+          </button>
+
+          <button 
+            onClick={() => setIsPasswordMode(!isPasswordMode)}
+            className="w-full text-zinc-500 text-sm hover:text-orange-500 transition-colors"
+          >
+            {isPasswordMode ? "استخدام تفعيل واتساب" : "لدي كلمة مرور (دخول سريع)"}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

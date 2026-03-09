@@ -1,0 +1,118 @@
+"use client"
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import { MapPin, Navigation, Building2, Search } from 'lucide-react'
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+
+const CITIES = ["الخرطوم", "أم درمان", "بحرى", "بورتسودان", "كسلا", "عطبرة", "ود مدني", "دنقلا"]
+
+export default function RequestsFeed() {
+  const [filterType, setFilterType] = useState('gps') // 'gps' or 'city'
+  const [selectedCity, setSelectedCity] = useState('')
+  const [requests, setRequests] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  const fetchRequests = async () => {
+    setLoading(true)
+    let query = supabase.from('requests').select('*').eq('status', 'open')
+
+    if (filterType === 'gps') {
+      // الحصول على الموقع الحالي واستخدام الدالة التي أنشأناها سابقاً
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { data } = await supabase.rpc('get_nearby_requests', {
+          user_lat: pos.coords.latitude,
+          user_lng: pos.coords.longitude,
+          dist_limit: 10
+        })
+        setRequests(data || [])
+      })
+    } else if (selectedCity) {
+      // الفلترة حسب المدينة يدوياً
+      const { data } = await query.eq('city', selectedCity).order('created_at', { ascending: false })
+      setRequests(data || [])
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    fetchRequests()
+  }, [filterType, selectedCity])
+
+  return (
+    <div className="min-h-screen bg-black text-white p-4">
+      {/* التبويبات العلوية */}
+      <div className="flex bg-zinc-900 p-1 rounded-2xl mb-6 border border-zinc-800">
+        <button 
+          onClick={() => setFilterType('gps')}
+          className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${filterType === 'gps' ? 'bg-orange-500 text-black font-bold' : 'text-zinc-500'}`}
+        >
+          <Navigation size={18}/> حولي (GPS)
+        </button>
+        <button 
+          onClick={() => setFilterType('city')}
+          className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${filterType === 'city' ? 'bg-orange-500 text-black font-bold' : 'text-zinc-500'}`}
+        >
+          <Building2 size={18}/> بالمدينة
+        </button>
+      </div>
+      
+      {/* اختيار المدينة (يظهر فقط عند اختيار فلترة المدينة) */}
+      {filterType === 'city' && (
+        <div className="mb-6 animate-in fade-in slide-in-from-top-2">
+          <select 
+            onChange={(e) => setSelectedCity(e.target.value)}
+            className="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-2xl focus:border-orange-500 outline-none appearance-none"
+          >
+            <option value="">اختر المدينة للبحث...</option>
+            {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+      )}
+
+        <Link href="/create" className="fixed bottom-24 left-6 bg-orange-500 p-4 rounded-full shadow-2xl text-black animate-bounce">
+   <PlusCircle size={32} />
+</Link>
+      {/* قائمة الطلبات */}
+      <div className="space-y-4">
+        {loading ? (
+          <p className="text-center text-zinc-500 py-10">جاري جلب الطلبات...</p>
+        ) : requests.length > 0 ? (
+          requests.map(req => (
+            <div key={req.id} className="bg-[#111] border border-zinc-800 p-5 rounded-3xl relative overflow-hidden group">
+              {/* شارة النوع */}
+              <div className={`absolute top-0 right-0 px-4 py-1 text-xs font-bold rounded-bl-xl ${req.type === 'cash' ? 'bg-green-500 text-black' : 'bg-orange-500 text-black'}`}>
+                {req.type === 'cash' ? 'محتاج كاش' : 'محتاج بنكك'}
+              </div>
+              
+              <div className="mb-4">
+                <span className="text-zinc-500 text-xs">المبلغ المطلوب:</span>
+                <div className="text-3xl font-mono font-bold text-white tracking-tighter">
+                  {Number(req.amount).toLocaleString()} <span className="text-sm font-normal">SDG</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center border-t border-zinc-900 pt-4">
+                <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                  <MapPin size={14} className="text-orange-500"/>
+                  {req.city || "موقع غير محدد"}
+                </div>
+                <a 
+                  href={`https://wa.me/${req.phone}`}
+                  className="bg-white text-black px-6 py-2 rounded-xl font-bold hover:scale-105 transition-transform"
+                >
+                  تواصل
+                </a>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-20 bg-zinc-900/50 rounded-3xl border border-dashed border-zinc-800">
+             <Search size={48} className="mx-auto mb-4 text-zinc-700"/>
+             <p className="text-zinc-500">لا توجد طلبات نشطة حالياً في هذا النطاق</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

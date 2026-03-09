@@ -1,0 +1,115 @@
+"use client"
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
+import { Phone, ArrowRight, MessageCircle } from 'lucide-react'
+
+export default function PhoneLogin() {
+  const [phone, setPhone] = useState('')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  // دالة المعالجة الرئيسية
+  const handleAuth = async () => {
+    if (phone.length < 9) {
+      alert("الرجاء إدخال رقم هاتف صحيح")
+      return
+    }
+
+    setLoading(true)
+    
+    // 1. تجهيز البيانات
+    const cleanPhone = phone.replace(/^0+/, '') // إزالة الصفر في البداية إن وجد
+    const fullPhone = `249${cleanPhone}`
+    const virtualEmail = `${fullPhone}@bankak-swap.com` // إيميل وهمي يعتمد على الرقم
+    const tempPassword = 'password123' // كلمة مرور ثابتة للنظام
+    const code = Math.floor(100000 + Math.random() * 900000).toString()
+
+    try {
+      // 2. تسجيل المستخدم برمجياً (SignUp) لتجاوز طلب SMS من سوبابيز
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: virtualEmail,
+        password: tempPassword,
+      })
+
+      // إذا كان المستخدم مسجلاً مسبقاً، نقوم بتسجيل الدخول فقط
+      if (signUpError && signUpError.message.includes('already registered')) {
+        await supabase.auth.signInWithPassword({
+          email: virtualEmail,
+          password: tempPassword,
+        })
+      }
+
+const { data, error } = await supabase.auth.signUp({
+  email: email,
+  password: password,
+  options: {
+    data: {
+      full_name: fullName, // الاسم من الحقل
+      phone: phoneNumber   // الرقم من الحقل
+    }
+  }
+})
+
+      // 4. فتح واتساب برسالة الكود
+      const adminPhone = "249912253188" // ضع رقمك الشخصي هنا لاستلام الرسائل
+      const waMessage = `كود تفعيل حسابي في Bankak Swap هو: ${code}`
+      const waUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(waMessage)}`
+      
+      window.open(waUrl, '_blank')
+
+      // 5. التوجه لصفحة الانتظار التي صممناها سابقاً
+      router.push('/verify-waiting')
+
+    } catch (err) {
+      alert("حدث خطأ غير متوقع، حاول مرة أخرى")
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white p-6 flex flex-col justify-center">
+      <div className="max-w-md mx-auto w-full space-y-8">
+        <div className="text-center">
+          <div className="inline-block p-3 bg-orange-500/10 rounded-full mb-4">
+             <MessageCircle className="text-orange-500" size={32} />
+          </div>
+          <h1 className="text-4xl font-extrabold text-orange-500 mb-2">Bankak Swap</h1>
+          <p className="text-zinc-400">سجل دخولك برقم الهاتف للبدء</p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-xs text-zinc-500 mr-2">رقم الهاتف الجوال</label>
+            <div className="relative">
+              <span className="absolute left-4 top-4 text-zinc-500 font-mono">+249</span>
+              <input 
+                type="tel" 
+                placeholder="9XXXXXXXX" 
+                className="w-full bg-zinc-900 p-4 pl-16 rounded-2xl border border-zinc-800 focus:border-orange-500 outline-none transition-all text-lg font-mono"
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <button 
+            onClick={handleAuth}
+            disabled={loading}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-black font-black py-5 rounded-2xl transition-all flex items-center justify-center gap-2 text-lg"
+          >
+            {loading ? "جاري التحضير..." : "تفعيل عبر واتساب"} <ArrowRight size={22} />
+          </button>
+
+          <p className="text-[10px] text-zinc-600 text-center px-4 leading-relaxed">
+            بالضغط على الزر، سيتم فتح تطبيق واتساب لإرسال كود تفعيل تلقائي إلى نظام الإدارة لتأكيد ملكية الرقم.
+          </p>
+        </div>
+      </div>
+      
+      {/* تأثير إضاءة خلفي خفيف */}
+      <div className="fixed bottom-0 left-0 right-0 h-64 bg-orange-500/5 blur-[100px] -z-10"></div>
+    </div>
+  )
+}
