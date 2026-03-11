@@ -34,3 +34,12 @@ body {
 .neon-text {
   text-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
 }
+html, body {
+  height: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}

@@ -61,14 +61,24 @@ export default function NewRequest() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // تحديث الموقع الجغرافي قبل إرسال الطلب لضمان دقة "حولي"
-      await updateLocation();
+      // 1. جلب الموقع الجغرافي "الآن" قبل إرسال الطلب
+      let currentLat = null;
+      let currentLng = null;
 
+      const coords = await updateLocation(); // ننتظر تحديث الموقع في البروفايل أولاً
+      if (coords) {
+        currentLat = coords.latitude;
+        currentLng = coords.longitude;
+      }
+
+      // 2. إرسال الطلب مع الإحداثيات مباشرة لجدول requests
       const { error } = await supabase.from('requests').insert({
         user_id: user.id,
         type: type, 
         amount: parseFloat(amount),
         city: userProfile?.city || 'أم درمان', 
+        lat: currentLat, // إرسال خط العرض هنا
+        lng: currentLng, // إرسال خط الطول هنا
         status: 'pending'
       });
 

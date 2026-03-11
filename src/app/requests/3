@@ -1,0 +1,120 @@
+"use client"
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import { MapPin, Navigation, Building2, Search, PlusCircle, MessageCircle, Loader2 } from 'lucide-react'
+import Link from "next/link"
+import { useRouter } from 'next/navigation' // الخطوة 1: استيراد الراوتر
+
+const CITIES = ["الخرطوم", "أم درمان", "بحرى", "بورتسودان", "كسلا", "عطبرة", "ود مدني", "دنقلا"]
+
+export default function RequestsFeed() {
+  const router = useRouter() // الخطوة 2: تعريف الراوتر
+  const [filterType, setFilterType] = useState('gps')
+  const [selectedCity, setSelectedCity] = useState('')
+  const [requests, setRequests] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [actionLoading, setActionLoading] = useState(null) // لمتابعة حالة الضغط على زر القبول
+
+  const fetchRequests = async () => {
+    setLoading(true)
+    if (filterType === 'gps') {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { data, error } = await supabase.rpc('get_nearby_requests', {
+          user_lat: pos.coords.latitude,
+          user_lng: pos.coords.longitude,
+          dist_limit_km: 100
+        })
+        if (!error) setRequests(data || [])
+        setLoading(false)
+      }, (err) => {
+        setFilterType('city') 
+        setLoading(false)
+      })
+    } else {
+      let query = supabase.from('requests').select('*, profiles(phone, full_name)').eq('status', 'pending')
+      if (selectedCity) query = query.eq('city', selectedCity)
+      const { data } = await query.order('created_at', { ascending: false })
+      setRequests(data || [])
+      setLoading(false)
+    }
+  }
+
+  // الكود الصحيح داخل handleAcceptRequest
+const handleAcceptRequest = async (requestId, creatorId) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // تأكد أن creatorId هو المعرف الخاص بصاحب المنشور (الذي يظهر في العمود user_id بجدول requests)
+  const { data: chatData, error } = await supabase
+    .from('chats')
+    .insert({
+      request_id: requestId,
+      user_1: creatorId, // صاحب الطلب (البائع/المشتري الأصلي)
+      user_2: user.id    // أنت (الشخص الذي ضغط على قبول الآن)
+    })
+    .select()
+    .single();
+
+  if (chatData) {
+    router.push(`/chat/${chatData.id}`);
+  }
+};
+
+  useEffect(() => { fetchRequests() }, [filterType, selectedCity])
+
+  return (
+    <div className="min-h-screen bg-black text-white p-4 pb-32">
+      {/* التبويبات العلوية */}
+      <div className="flex bg-zinc-900 p-1 rounded-2xl mb-6 border border-zinc-800">
+        <button onClick={() => setFilterType('gps')} className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${filterType === 'gps' ? 'bg-orange-500 text-black font-bold' : 'text-zinc-500'}`}>
+          <Navigation size={18}/> حولي
+        </button>
+        <button onClick={() => setFilterType('city')} className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${filterType === 'city' ? 'bg-orange-500 text-black font-bold' : 'text-zinc-500'}`}>
+          <Building2 size={18}/> بالمدينة
+        </button>
+      </div>
+      
+      {/* قائمة الطلبات */}
+      <div className="space-y-4 text-right">
+        {loading ? (
+          <p className="text-center text-zinc-500 py-10 font-bold animate-pulse">جاري جلب الطلبات...</p>
+        ) : requests.map(req => (
+          <div key={req.id} className="bg-zinc-900/50 border border-zinc-800 p-5 rounded-[2rem] relative group">
+            <div className={`absolute top-0 left-0 px-4 py-1 text-[10px] font-black rounded-br-xl ${req.type === 'bank_to_cash' ? 'bg-green-500 text-black' : 'bg-orange-500 text-black'}`}>
+              {req.type === 'bank_to_cash' ? 'محتاج كاش' : 'محتاج بنكك'}
+            </div>
+            
+            <div className="mb-4 mt-2 px-1">
+              <span className="text-zinc-600 text-[10px] font-bold uppercase">المبلغ</span>
+              <div className="text-3xl font-black font-mono">{Number(req.amount).toLocaleString()} <span className="text-xs font-normal text-zinc-500">SDG</span></div>
+            </div>
+
+            <div className="flex justify-between items-center border-t border-zinc-800/50 pt-4">
+              {/* زر قبول الطلب الذي يفتح الدردشة */}
+              <button 
+                onClick={() => handleAcceptRequest(req.id, req.user_id)}
+                disabled={actionLoading === req.id}
+                className="bg-orange-500 text-black px-6 py-2.5 rounded-2xl font-black text-sm flex items-center gap-2 active:scale-95 disabled:opacity-50"
+              >
+                {actionLoading === req.id ? <Loader2 className="animate-spin" size={18}/> : <MessageCircle size={18} />}
+                قبول وتواصل
+              </button>
+
+              <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center gap-2 text-zinc-400 text-xs bg-black/30 px-3 py-1.5 rounded-xl border border-zinc-800/50">
+                  <Navigation size={12} className="text-orange-500" />
+                  <span className="font-bold">
+                    {req.dist_meters < 1000 ? `${Math.round(req.dist_meters)} متر` : `${(req.dist_meters / 1000).toFixed(1)} كم`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Link href="/new-request" className="fixed bottom-24 left-6 bg-orange-500 p-4 rounded-full shadow-2xl text-black z-50">
+        <PlusCircle size={32} />
+      </Link>
+    </div>
+  )
+}

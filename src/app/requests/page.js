@@ -3,20 +3,23 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { MapPin, Navigation, Building2, Search, PlusCircle, MessageCircle } from 'lucide-react'
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const CITIES = ["الخرطوم", "أم درمان", "بحرى", "بورتسودان", "كسلا", "عطبرة", "ود مدني", "دنقلا"]
+
+
 
 export default function RequestsFeed() {
   const [filterType, setFilterType] = useState('gps') // 'gps' or 'city'
   const [selectedCity, setSelectedCity] = useState('')
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(false)
-
+  const router = useRouter();
   const fetchRequests = async () => {
     setLoading(true)
     
     let query = supabase.from('requests').select('*').eq('status', 'pending')
-    
+
     if (filterType === 'gps') {
       navigator.geolocation.getCurrentPosition(async (pos) => {
         // استدعاء الدالة الجغرافية المحدثة التي تحسب الأمتار
@@ -75,6 +78,42 @@ export default function RequestsFeed() {
     fetchRequests()
   }, [filterType, selectedCity])
 
+
+//دالة انشاء السجلات في جدول شات
+  const acceptRequest = async (requestId, creatorId) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  console.log("requestId:", requestId);
+  console.log("creatorId:", creatorId);
+
+  if (!user) {
+    alert("الرجاء تسجيل الدخول أولاً");
+    return;
+  }
+
+  // محاولة إنشاء المحادثة
+  const { data, error } = await supabase
+    .from('chats')
+    .insert({
+      request_id: requestId,
+      user_1: creatorId, // صاحب الطلب
+      user_2: user.id    // الشخص الحالي (المستلم)
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.log("تفاصيل الخطأ:", error);
+    alert("فشل قبول الطلب: " + error.message);
+    return;
+  }
+
+  if (data) {
+    router.push(`/chat/${data.id}`);
+  }
+
+}; 
+
   return (
     <div className="min-h-screen bg-black text-white p-4 pb-32">
       {/* التبويبات العلوية */}
@@ -105,15 +144,19 @@ export default function RequestsFeed() {
         </div>
       )}
 
-      <Link href="/new-request" className="fixed bottom-24 left-6 bg-orange-500 p-4 rounded-full shadow-2xl text-black z-50 hover:scale-110 active:scale-90 transition-all">
-        <PlusCircle size={32} />
-      </Link>
+      <Link
+  href="/new-request"
+  className="fixed bottom-28 left-6 bg-orange-500 p-4 rounded-full shadow-2xl text-black z-50 hover:scale-110 active:scale-90 transition-all animate-bounce"
+>
+  <PlusCircle size={32} />
+</Link>
 
       {/* قائمة الطلبات */}
       <div className="space-y-4 text-right">
         {loading ? (
-          <p className="text-center text-zinc-500 py-10 font-bold animate-pulse text-sm uppercase tracking-widest">جاري تحديد موقعك وجلب أقرب الطلبات...</p>
-        ) : requests.length > 0 ? (
+       <p className="text-center text-zinc-500 py-10 font-bold animate-pulse text-sm uppercase tracking-widest">جاري تحديد موقعك وجلب أقرب الطلبات...</p>
+      ) 
+       : requests.length > 0 ? (
           requests.map(req => (
             <div key={req.id} className="bg-zinc-900/50 border border-zinc-800 p-5 rounded-[2rem] relative overflow-hidden group hover:border-zinc-700 transition-all">
               
@@ -129,13 +172,13 @@ export default function RequestsFeed() {
               </div>
 
               <div className="flex justify-between items-center border-t border-zinc-800/50 pt-4">
-                <a 
-                  href={`https://wa.me/${req.phone_number}`}
-                  target="_blank"
-                  className="bg-white text-black px-6 py-2.5 rounded-2xl font-black text-sm hover:bg-green-500 transition-all flex items-center gap-2 active:scale-90"
-                >
-                  <MessageCircle size={18} /> تواصل
-                </a>
+        
+                <button
+  onClick={() => acceptRequest(req.id, req.user_id)}
+  className="bg-white text-black px-6 py-2.5 rounded-2xl font-black text-sm hover:bg-green-500 transition-all flex items-center gap-2 active:scale-90"
+>
+  <MessageCircle size={18} /> قبول الطلب
+</button>
 
                 <div className="flex flex-col items-end gap-1">
                   {/* الخطوة 2 المدمجة: عرض المسافة بدقة الأمتار */}
