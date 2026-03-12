@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { User, MapPin, Save, LogOut } from 'lucide-react'
+import { Shield } from "lucide-react";
+import { useRouter } from 'next/navigation';
 
 const CITIES = ["الخرطوم", "أم درمان", "بحرى", "بورتسودان", "كسلا", "عطبرة", "ود مدني", "دنقلا"]
 
@@ -12,6 +14,7 @@ export default function ProfilePage() {
   const [profession, setProfession] = useState('')
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false) // تتحكم في حالة الزر بعد الحفظ
+const router = useRouter();
   // جلب بيانات المستخدم
   useEffect(() => {
     async function getProfile() {
@@ -77,7 +80,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-black text-white p-6">
       <h2 className="text-2xl font-bold mb-8 border-r-4 border-orange-500 pr-4">
-        إكمال الملف الشخصي
+       الملف الشخصي
       </h2>
 
       <div className="space-y-6 max-w-md mx-auto">
@@ -91,7 +94,7 @@ export default function ProfilePage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-2xl focus:border-orange-500 outline-none"
-            placeholder="مثلاً: محمد أحمد"
+            placeholder="الاسم "
           />
         </div>
 
@@ -113,7 +116,7 @@ export default function ProfilePage() {
         {/* رقم الهاتف / واتساب */}
         <div className="space-y-2">
           <label className="text-sm text-zinc-500 flex items-center gap-2">
-            رقم الهاتف / واتساب
+            رقم الهاتف الوتساب
           </label>
           <input 
             value={phone}
@@ -132,9 +135,14 @@ export default function ProfilePage() {
             value={profession}
             onChange={(e) => setProfession(e.target.value)}
             className="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-2xl focus:border-orange-500 outline-none"
-            placeholder="مثلاً: مهندس / طبيب / مدرس"
+            placeholder="عامل / مهندس / طبيب / مدرس"
           />
         </div>
+
+ <div onClick={() => router.push('/terms')} className="flex items-center justify-between p-4 bg-zinc-900 rounded-2xl cursor-pointer">
+  <span className="text-sm font-bold">الشروط والقوانين</span>
+  <Shield size={18} className="text-zinc-500" />
+</div>
 
         {/* زر الحفظ / متابعة */}
 <button 

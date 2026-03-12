@@ -10,10 +10,12 @@ export default function BottomNav() {
 
   // اخفاء الشريط في الصفحة الرئيسية
   if (pathname === "/") return null
-
+  if (pathname === "/login") return null
+  if (pathname === "/profile") return null
+  if (pathname.startsWith("/chat/")) return null;
   const navItems = [
     { name: "الطلبات", icon: Home, path: "/requests" },
-    { name: "طلب جديد", icon: PlusCircle, path: "/create" },
+    { name: "طلب جديد", icon: PlusCircle, path: "/new-request" },
     { name: "الدردشة", icon: MessageCircle, path: "/chats" },
     { name: "طلباتي", icon: List, path: "/my-requests" },
     { name: "حسابي", icon: User, path: "/profile" },

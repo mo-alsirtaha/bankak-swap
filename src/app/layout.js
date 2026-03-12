@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "طلباتي",
-  description: "تطبيق إدارة الطلبات",
+  title: "Bankak Swap",
+  description:"بدل أموالك (كاش أو بنكك) مع أشخاص حقيقيين بالقرب منك في ثوانٍ.",
   viewport: "width=device-width, initial-scale=1",
 };
 

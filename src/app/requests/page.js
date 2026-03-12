@@ -160,12 +160,13 @@ export default function RequestsFeed() {
           requests.map(req => (
             <div key={req.id} className="bg-zinc-900/50 border border-zinc-800 p-5 rounded-[2rem] relative overflow-hidden group hover:border-zinc-700 transition-all">
               
-              <div className={`absolute top-0 left-0 px-4 py-1 text-[10px] font-black rounded-br-xl ${req.type === 'bank_to_cash' ? 'bg-green-500 text-black' : 'bg-orange-500 text-black'}`}>
-                {req.type === 'bank_to_cash' ? 'محتاج كاش' : 'محتاج بنكك'}
-              </div>
+                     
+            <div className={`absolute top-0 left-0 px-4 py-1 text-[10px] font-black rounded-br-xl ${req.type === 'bank_to_cash' ? 'bg-green-500 text-black' : 'bg-orange-500 text-black'}`}>  
+              {req.type === 'bank_to_cash' ? 'محتاج كاش' : 'محتاج بنكك'}  
+            </div>  
               
               <div className="mb-4 mt-2 px-1">
-                <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-wider">المبلغ المطلوب</span>
+                <span clasame="text-zinc-600 text-[10px] font-bold uppercase tracking-wider">المبلغ المطلوب</span>
                 <div className="text-3xl font-black font-mono text-white tracking-tighter">
                   {Number(req.amount).toLocaleString()} <span className="text-xs font-normal text-zinc-500">SDG</span>
                 </div>

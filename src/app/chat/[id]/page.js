@@ -70,19 +70,19 @@ if (chatInfo) {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const sendMessage = async (e) => {
-    e.preventDefault()
-    if (!newMessage.trim()) return
+  const sendMessage = async () => {
+  if (!newMessage.trim()) return;
 
-    const messageContent = newMessage
-    setNewMessage('')
-
-    await supabase.from('messages').insert({
-      chat_id: chatId,
-      sender_id: myId,
-      content: messageContent
-    })
-  }
+  const { error } = await supabase.from('messages').insert({
+    chat_id: chatId,
+    sender_id: myId,
+    receiver_id: otherUser.id, // هذا السطر ضروري جداً لتفعيل الإشعار عند الطرف الآخر
+    content: newMessage,
+    is_read: false
+  });
+  
+  setNewMessage('');
+};
 
   const shareMyPhone = async () => {
     const { data: profile } = await supabase.from('profiles').select('phone').eq('id', myId).single()
@@ -91,9 +91,31 @@ if (chatInfo) {
     }
   }
 
+  const handleReport = async () => {
+  const reason = prompt("يرجى كتابة سبب البلاغ (مثال: طلب زيادة مالية، سلوك مشبوه، عدم الحضور):");
+  
+  if (!reason) return;
+
+  const { error } = await supabase.from('reports').insert({
+    reporter_id: myId,
+    reported_user_id: otherUser.id,
+    chat_id: chatId,
+    reason: reason
+  });
+
+  if (error) {
+    alert("فشل إرسال البلاغ");
+  } else {
+    alert("تم استلام بلاغك بنجاح، سيقوم فريق العمل بمراجعته واتخاذ الإجراء اللازم.");
+  }
+};
+
   return (
-    <div className="flex flex-col h-screen bg-black text-white">
-      {/* Header */}
+  <div className="flex flex-col h-screen bg-black text-white">
+     {/* Header */}
+   <div className="bg-orange-500/10 p-2 text-[9px] text-orange-500 text-center font-bold">
+  تنبيه: لا تقم بتحويل الأموال إلا عند المقابلة الشخصية والتأكد من استلام الكاش.
+</div>
       <div className="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between shadow-xl">
         <button onClick={() => router.back()} className="text-zinc-400 hover:text-white">
           <ArrowRight size={24} />
@@ -103,6 +125,10 @@ if (chatInfo) {
             <User size={18} className="text-black" />
           </div>
           <span className="font-bold text-sm">{otherUser?.full_name || 'جارِ التحميل...'}</span>
+ {/* // في الـ JSX (أعلى الصفحة)*/}
+<button onClick={handleReport} className="text-[10px] bg-red-500/10 text-red-500 px-3 py-1 rounded-full font-bold">
+  إبلاغ عن مخالفة
+</button>
         </div>
         <button onClick={shareMyPhone} className="bg-zinc-800 p-2 rounded-xl text-orange-500 hover:bg-orange-500 hover:text-black transition-all">
           <Phone size={20} />
@@ -138,7 +164,7 @@ if (chatInfo) {
           className="flex-1 bg-black border border-zinc-800 p-4 rounded-2xl outline-none focus:border-orange-500 transition-all text-sm"
         />
         <button type="submit" className="bg-orange-500 text-black p-4 rounded-2xl hover:scale-105 transition-transform active:scale-95 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
-          <Send size={20} />
+          < Send size={20} />
         </button>
       </form>
     </div>

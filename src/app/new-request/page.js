@@ -113,6 +113,10 @@ export default function NewRequest() {
             className="w-full bg-transparent text-center text-5xl font-black font-mono outline-none text-white placeholder:text-zinc-800"
           />
         </div>
+       
+       <p className="text-[10px] text-zinc-500 text-center px-4">
+  بضغطك على أزرار التبادل، أنت توافق على <a href="/terms" className="text-orange-500 underline">شروط الاستخدام</a> وتقر بأن التطبيق وسيط لا يتحمل مسؤولية التبادل المالي.
+</p>
 
         {/* أزرار الإجراءات */}
         <div className="grid grid-cols-2 gap-5">
