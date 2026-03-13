@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.bankak.swap",
-        "sha256_cert_fingerprints": ["C3:09:62:1A:37:D6:BA:60:DE:47:A8:FF:AB:76:36:0C:40:39:F1:0D:FD:3C:BD:25:4F:02:44:D8:47:E1:AE:21"]
-      }
-    }]
