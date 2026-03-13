@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase'
 import { MapPin, Navigation, Building2, Search, PlusCircle, MessageCircle } from 'lucide-react'
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import PWAInstall from '@/components/PWAInstall';
+
 
 const CITIES = ["الخرطوم", "أم درمان", "بحرى", "بورتسودان", "كسلا", "عطبرة", "ود مدني", "دنقلا"]
 
@@ -150,8 +152,14 @@ export default function RequestsFeed() {
         >
           <Building2 size={18}/> بالمدينة
         </button>
-      </div>
       
+      
+    
+      <PWAInstall /> {/* سيظهر الزر فقط إذا كان المتصفح يدعم التثبيت */}
+      {/* باقي محتوى الصفحة */}
+    </div>
+  
+  
       {filterType === 'city' && (
         <div className="mb-6 animate-in fade-in slide-in-from-top-2">
           <select 
