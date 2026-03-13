@@ -1,8 +1,10 @@
 "use client"
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft, Zap, ShieldCheck, MapPin, Repeat } from 'lucide-react'
 
 export default function WelcomePage() {
+  const router = useRouter(); // ✅ تعريف router
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-between p-6 pb-12">
       
@@ -52,9 +54,34 @@ export default function WelcomePage() {
           ابدأ التبديل الآن <ArrowLeft size={24} />
         </Link>
         
-        <p className="text-center text-zinc-600 text-xs">
-          بانضمامك أنت توافق على شروط الاستخدام وسياسة الخصوصية
-        </p>
+        <div className="mt-6 px-4">
+  <div className="flex items-start gap-3 p-4 bg-zinc-900/40 border border-zinc-800 rounded-2xl backdrop-blur-sm">
+    <div className="flex-1 text-right">
+      <p className="text-[11px] text-zinc-500 leading-relaxed font-medium">
+        بانضمامك إلينا، أنت تؤكد موافقتك الكاملة على 
+        <button 
+          onClick={() => router.push('/terms')} 
+          className="text-orange-500 hover:underline mx-1 font-bold"
+        >
+          شروط الاستخدام
+        </button> 
+        و 
+        <button 
+          onClick={() => router.push('/privacy')} 
+          className="text-orange-500 hover:underline mx-1 font-bold"
+        >
+          سياسة الخصوصية
+        </button>
+        . نحن نعمل كوسيط تقني فقط لضمان أمان تبادلك.
+      </p>
+    </div>
+    
+    {/* أيقونة حماية بسيطة */}
+    <div className="p-2 bg-orange-500/10 rounded-lg">
+      <ShieldCheck size={16} className="text-orange-500" />
+    </div>
+  </div>
+</div>
       </div>
 
       {/* خلفية فنية خفيفة (Glow effect) */}

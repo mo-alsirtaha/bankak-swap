@@ -9,7 +9,7 @@ export default function NewRequest() {
   const [amount, setAmount] = useState('')
   const [userProfile, setUserProfile] = useState(null)
   const router = useRouter()
-
+  
   // جلب بيانات بروفايل المستخدم عند تحميل الصفحة
   useEffect(() => {
     const fetchProfile = async () => {

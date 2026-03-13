@@ -45,6 +45,26 @@ export default function RequestsFeed() {
       setLoading(false)
     }
   }
+ 
+  useEffect(() => {
+  const checkBanStatus = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_banned')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.is_banned) {
+        alert("تم حظر حسابك لمخالفتك شروط الاستخدام والأمان.");
+        await supabase.auth.signOut();
+        window.location.href = '/login';
+      }
+    }
+  };
+  checkBanStatus();
+}, []);
 
   useEffect(() => {
   const syncLocation = async () => {

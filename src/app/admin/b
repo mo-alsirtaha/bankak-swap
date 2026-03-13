@@ -1,0 +1,116 @@
+"use client"
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import { ShieldAlert, UserX, CheckCircle, Trash2, Loader2 } from 'lucide-react'
+
+export default function AdminDashboard() {
+  const [reports, setReports] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchReports()
+  }, [])
+
+  const fetchReports = async () => {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from('reports')
+      .select(`
+        *,
+        reporter:profiles!reporter_id (full_name),
+        reported:profiles!reported_user_id (id, full_name, is_banned)
+      `)
+      .order('created_at', { ascending: false })
+
+    if (!error) setReports(data)
+    setLoading(false)
+  }
+
+  const handleBan = async (userId, currentStatus) => {
+    const confirmBan = confirm(currentStatus ? "هل تريد إلغاء الحظر عن هذا المستخدم؟" : "هل أنت متأكد من حظر هذا المستخدم نهائياً؟")
+    if (!confirmBan) return
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_banned: !currentStatus })
+      .eq('id', userId)
+
+    if (!error) {
+      alert("تم تحديث حالة المستخدم بنجاح")
+      fetchReports() // تحديث القائمة
+    }
+  }
+
+  const deleteReport = async (reportId) => {
+    if (!confirm("هل تريد حذف هذا البلاغ من القائمة؟")) return
+    await supabase.from('reports').delete().eq('id', reportId)
+    fetchReports()
+  }
+
+  if (loading) return (
+    <div className="h-screen bg-black flex items-center justify-center">
+      <Loader2 className="animate-spin text-orange-500" size={48} />
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen bg-black text-white p-6">
+      <header className="mb-10 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-black text-orange-500 italic uppercase">Admin Control</h1>
+          <p className="text-zinc-500 text-sm">إدارة البلاغات وحماية Ba Swap</p>
+        </div>
+        <div className="bg-zinc-900 px-4 py-2 rounded-2xl border border-zinc-800">
+          <span className="text-orange-500 font-bold">{reports.length}</span> بلاغات معلقة
+        </div>
+      </header>
+
+      <div className="grid gap-6">
+        {reports.length > 0 ? reports.map((report) => (
+          <div key={report.id} className={`p-6 rounded-[2rem] border transition-all ${report.reported?.is_banned ? 'bg-red-500/5 border-red-500/20' : 'bg-zinc-900/50 border-zinc-800'}`}>
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex gap-3">
+                <div className={`p-3 rounded-xl ${report.reported?.is_banned ? 'bg-red-500 text-white' : 'bg-orange-500 text-black'}`}>
+                  <ShieldAlert size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">بلاغ ضد: {report.reported?.full_name}</h3>
+                  <p className="text-xs text-zinc-500">المُبلغ: {report.reporter?.full_name}</p>
+                </div>
+              </div>
+              <span className="text-[10px] text-zinc-600 font-mono">
+                {new Date(report.created_at).toLocaleString('ar-EG')}
+              </span>
+            </div>
+
+            <div className="bg-black/40 p-4 rounded-xl mb-6 border border-zinc-800/50">
+              <p className="text-sm text-zinc-300 leading-relaxed italic">"{report.reason}"</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button 
+                onClick={() => handleBan(report.reported_user_id, report.reported?.is_banned)}
+                className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl font-bold text-xs transition-all ${report.reported?.is_banned ? 'bg-green-600 text-white' : 'bg-red-600 text-white hover:bg-red-700'}`}
+              >
+                {report.reported?.is_banned ? <CheckCircle size={16} /> : <UserX size={16} />}
+                {report.reported?.is_banned ? "إلغاء الحظر" : "حظر المستخدم"}
+              </button>
+              
+              <button 
+                onClick={() => deleteReport(report.id)}
+                className="bg-zinc-800 p-3 rounded-xl text-zinc-400 hover:text-white transition-all"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+        )) : (
+          <div className="text-center py-20 bg-zinc-900/30 rounded-[3rem] border border-dashed border-zinc-800">
+             <CheckCircle size={48} className="mx-auto text-zinc-800 mb-4" />
+             <p className="text-zinc-500">لا توجد بلاغات حالياً. النظام آمن!</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

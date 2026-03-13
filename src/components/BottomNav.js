@@ -12,6 +12,8 @@ export default function BottomNav() {
   if (pathname === "/") return null
   if (pathname === "/login") return null
   if (pathname === "/profile") return null
+  if (pathname === "/terms") return null
+  if (pathname === "/privacy") return null 
   if (pathname.startsWith("/chat/")) return null;
   const navItems = [
     { name: "الطلبات", icon: Home, path: "/requests" },
