@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  manifest: '/manifest.json',
   title: "Bankak Swap",
-  description:"بدل أموالك (كاش أو بنكك) مع أشخاص حقيقيين بالقرب منك في ثوانٍ.",
+  description: "حل مشكلة السيولة في السودان",
   viewport: "width=device-width, initial-scale=1",
 };
 ;

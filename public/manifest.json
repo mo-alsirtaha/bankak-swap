@@ -1,10 +1,12 @@
 {
   "name": "bankak Swap",
   "short_name": "bankak",
+  "description": "منصة تبادل النقد والتحويل البنكي في السودان",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#f97316",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192x192.png",
