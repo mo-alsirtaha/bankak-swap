@@ -43,3 +43,17 @@ html, body {
 * {
   box-sizing: border-box;
 }
+@layer utilities {
+  .safe-area-bottom {
+    /* يضمن أن صندوق الإرسال لا يختفي خلف أزرار التنقل في الهاتف */
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+}
+
+/* حل مشكلة الطول في المتصفحات */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* يمنع السكرول الخارجي المزعج */
+}
