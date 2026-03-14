@@ -5,7 +5,7 @@ import { MapPin, Navigation, Building2, Search, PlusCircle, MessageCircle } from
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PWAInstall from '@/components/PWAInstall';
-
+import NotificationSetup from '@/components/NotificationSetup' // حسب مسار الملف عندك
 
 const CITIES = ["الخرطوم", "أم درمان", "بحرى", "بورتسودان", "كسلا", "عطبرة", "ود مدني", "دنقلا"]
 
@@ -153,9 +153,10 @@ export default function RequestsFeed() {
           <Building2 size={18}/> بالمدينة
         </button>
       
-      
-    
-      <PWAInstall /> {/* سيظهر الزر فقط إذا كان المتصفح يدعم التثبيت */}
+     <PWAInstall /> {/* سيظهر الزر فقط إذا كان المتصفح يدعم التثبيت */}
+  
+  
+    <NotificationSetup />
       {/* باقي محتوى الصفحة */}
     </div>
   
