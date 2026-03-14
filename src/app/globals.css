@@ -43,15 +43,37 @@ html, body {
 * {
   box-sizing: border-box;
 }
+
 @layer utilities {
   .safe-area-bottom {
-    /* يضمن أن صندوق الإرسال لا يختفي خلف أزرار التنقل في الهاتف */
+    /* يحمي العناصر من التداخل مع أزرار التنقل في الهواتف */
     padding-bottom: env(safe-area-inset-bottom, 16px);
   }
 }
 
-/* حل مشكلة الطول في المتصفحات */
+/* التعديل الجديد لحل مشكلة التوقف */
 html, body {
+  /* نستخدم min-height بدلاً من height الثابت */
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  /* قمنا بإزالة overflow: hidden للسماح بالتمرير الطبيعي */
+  overflow-x: hidden; /* يمنع التمرير الأفقي فقط لتجنب اهتزاز الصفحة */
+}
+
+/* إذا كنت تريد منع التمرير في صفحة الدردشة فقط، يمكنك عمل class مخصص */
+.no-scroll {
+  overflow: hidden;
+  height: 100dvh;
+} 
+/*
+@layer utilities {
+  .safe-area-bottom {}   */
+  /* padding-bottom: env(safe-area-inset-bottom, 16px);
+  
+
+/* حل مشكلة الطول في المتصفحات */
+{/*html, body {
   height: 100%;
   margin: 0;
   padding: 0;

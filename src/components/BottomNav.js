@@ -15,6 +15,7 @@ export default function BottomNav() {
   if (pathname === "/terms") return null
   if (pathname === "/privacy") return null 
   if (pathname.startsWith("/chat/")) return null;
+  if (pathname ==="/verify-waiting")return null;
   const navItems = [
     { name: "الطلبات", icon: Home, path: "/requests" },
     { name: "طلب جديد", icon: PlusCircle, path: "/new-request" },
