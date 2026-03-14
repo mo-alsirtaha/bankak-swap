@@ -1,46 +1,30 @@
-"use client";
+"use client"
+import { useEffect } from 'react';
+import OneSignal from 'react-onesignal';
 
-import { useEffect } from "react";
-import OneSignal from "react-onesignal";
-
-export default function NotificationSetup({ userId }) {
+export default function NotificationSetup() {
   useEffect(() => {
+    // التأكد من أننا في المتصفح ولدينا الـ ID
     const initOneSignal = async () => {
-      // تأكد أننا داخل المتصفح
-      if (typeof window === "undefined") return;
-
       try {
-        // لا تعيد التهيئة أكثر من مرة
-        if (!window.__oneSignalInitialized) {
-          await OneSignal.init({
-            appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
-            allowLocalhostAsSecureOrigin: true,
-            notifyButton: {
-              enable: false,
-            },
-          });
-
-          window.__oneSignalInitialized = true;
-        }
-
-        // ربط المستخدم الحالي مع OneSignal
-        if (userId) {
-          await OneSignal.login(userId.toString());
-        }
-
-        // اسأل عن الإذن فقط إذا لم يتم منحه أو رفضه سابقاً
-        const permission = await OneSignal.Notifications.permission;
-
-        if (permission !== "granted") {
-          await OneSignal.Slidedown.promptPush();
-        }
-      } catch (error) {
-        console.error("OneSignal init error:", error);
+        await OneSignal.init({ 
+          appId: "3b2b3b88-3535-4024-99ed-7cffbc9120d1", // الذي ستحصل عليه من OneSignal
+          allowLocalhostAsSecureOrigin: true,
+          notifyButton: {
+            enable: false, // لا نريد ظهور زر الجرس العائم المزعج
+          },
+        });
+        
+        // إظهار طلب الإذن تلقائياً للمستخدم
+        OneSignal.Slidedown.promptPush(); 
+        
+      } catch (err) {
+        console.error("خطأ في تشغيل الإشعارات:", err);
       }
     };
 
     initOneSignal();
-  }, [userId]);
+  }, []);
 
   return null;
 }
