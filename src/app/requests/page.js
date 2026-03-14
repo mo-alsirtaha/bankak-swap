@@ -152,11 +152,10 @@ export default function RequestsFeed() {
         >
           <Building2 size={18}/> بالمدينة
         </button>
-      
+          <NotificationSetup />
      <PWAInstall /> {/* سيظهر الزر فقط إذا كان المتصفح يدعم التثبيت */}
   
   
-    <NotificationSetup />
       {/* باقي محتوى الصفحة */}
     </div>
   
