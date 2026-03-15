@@ -3,13 +3,21 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Landmark, Banknote, Loader2, MapPin } from 'lucide-react'
+import SuccessModal from '@/components/SuccessModal'
 
 export default function NewRequest() {
   const [loading, setLoading] = useState(false)
   const [amount, setAmount] = useState('')
   const [userProfile, setUserProfile] = useState(null)
   const router = useRouter()
-  
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+const [successMessage, setSuccessMessage] = useState('')
+
+
+const handleCloseSuccessModal = () => {
+  setShowSuccessModal(false)
+  router.push('/requests')
+}
   // جلب بيانات بروفايل المستخدم عند تحميل الصفحة
   useEffect(() => {
     const fetchProfile = async () => {
@@ -85,8 +93,9 @@ export default function NewRequest() {
 
       if (error) throw error;
 
-      alert("تم نشر طلبك بنجاح! سيظهر الآن للمستخدمين القريبين منك.");
-      router.push('/requests'); 
+setSuccessMessage("تم نشر طلبك بنجاح! سيظهر الآن للمستخدمين القريبين منك.")
+setShowSuccessModal(true)
+
     } catch (err) {
       alert("خطأ في النشر: " + err.message);
     } finally {
@@ -169,6 +178,11 @@ export default function NewRequest() {
           </div>
         )}
       </div>
+   <SuccessModal
+  isOpen={showSuccessModal}
+  onClose={handleCloseSuccessModal}
+  message={successMessage}
+/>
     </div>
   )
 }

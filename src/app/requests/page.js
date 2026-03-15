@@ -199,14 +199,16 @@ export default function RequestsFeed() {
                   {Number(req.amount).toLocaleString()} <span className="text-xs font-normal text-zinc-500">SDG</span>
                 </div>
               </div>
-               {req.comment && (
-  <div className="mt-3 mb-4 p-3 bg-zinc-950/70 rounded-2xl border border-zinc-800 border-r-4 border-orange-500">
-    
-    <p className="text-sm text-zinc-300 text-right leading-relaxed">
-      {req.comment}
-    </p>
-  </div>
-)}
+               
+        {/* التعليق اليدوي */}
+  {req.comment && (
+    <div className="bg-black/40 border-r-4 border-orange-500 px-3 py-2 my-4 rounded-lg">
+       <p className="text-[11px] text-zinc-300 text-right leading-tight font-medium italic">
+          "{req.comment}"
+       </p>
+    </div>
+  )}
+
               <div className="flex justify-between items-center border-t border-zinc-800/50 pt-4">
         
                 <button
