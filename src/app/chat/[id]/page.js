@@ -33,7 +33,7 @@ export default function ChatPage() {
 
 if (chatInfo) {
   // استخدام الارتباط الاختياري لمنع الانهيار
-  const partner = chatInfo.user_1?.id === myId ? chatInfo.user_2 : chatInfo.user_1;
+  const partner = chatInfo.user_1?.id === user.id ? chatInfo.user_2 : chatInfo.user_1;
   setOtherUser(partner || { full_name: "مستخدم غير معروف" });
 }
 

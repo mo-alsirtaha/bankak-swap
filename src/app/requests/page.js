@@ -243,12 +243,16 @@ export default function RequestsFeed() {
 
               <div className="flex justify-between items-center border-t border-zinc-800/50 pt-4">
         
-                <button
-  onClick={(e) => {
-    e.preventDefault();
-    acceptRequest(req.id, req.user_id)}
+              {/*}  <button
+  onClick={() => { acceptRequest(req.id, req.user_id)}
   }
     className="bg-white text-black px-6 py-2.5 rounded-2xl font-black text-sm hover:bg-green-500 transition-all flex items-center gap-2 active:scale-90"
+>
+  <MessageCircle size={18} /> قبول الطلب
+</button>*/}
+<button
+  onClick={() => acceptRequest(req)} // نمرر req فقط
+  className="bg-white text-black px-6 py-2.5 rounded-2xl font-black text-sm active:scale-95 transition-all flex items-center gap-2"
 >
   <MessageCircle size={18} /> قبول الطلب
 </button>
