@@ -99,8 +99,40 @@ export default function RequestsFeed() {
   useEffect(() => {
     fetchRequests()
   }, [filterType, selectedCity])
+//الدالة الجديدة 
+  const acceptRequest = async (request) => { // نمرر كائن الطلب بالكامل
+  const { data: { user } } = await supabase.auth.getUser();
 
+  if (!user) {
+    alert("الرجاء تسجيل الدخول أولاً");
+    return;
+  }
 
+  // التحقق من البيانات قبل الإرسال (Debugging)
+  console.log("إيدي الطلب:", request.id);
+  console.log("صاحب الطلب:", request.user_id);
+
+  try {
+    const { data, error } = await supabase
+      .from('chats')
+      .insert({
+        request_id: request.id,
+        user_1: request.user_id, // تأكد أنه user_id حسب دالة الـ SQL
+        user_2: user.id
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    if (data) router.push(`/chat/${data.id}`);
+
+  } catch (error) {
+    console.error("خطأ في إنشاء المحادثة:", error);
+    alert("عذراً، تعذر فتح المحادثة حالياً");
+  }
+};
+
+{/*
 //دالة انشاء السجلات في جدول شات
   const acceptRequest = async (requestId, creatorId) => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -134,11 +166,11 @@ export default function RequestsFeed() {
     router.push(`/chat/${data.id}`);
   }
 
-}; 
+}; */}
 
   return (
     <div className="min-h-screen bg-black text-white p-4 pb-32">
-      {/* التبويبات العلوية */}
+      {/*التبويبات العلوية */}
       <div className="flex bg-zinc-900 p-1 rounded-2xl mb-6 border border-zinc-800">
         <button 
           onClick={() => setFilterType('gps')}
@@ -153,7 +185,7 @@ export default function RequestsFeed() {
           <Building2 size={18}/> بالمدينة
         </button>
           <NotificationSetup />
-     <PWAInstall /> {/* سيظهر الزر فقط إذا كان المتصفح يدعم التثبيت */}
+     <PWAInstall /> {/* سيظهر الزر فقط إذا كان المتصفح يدعم التثبيت 
   
   
       {/* باقي محتوى الصفحة */}
@@ -212,8 +244,11 @@ export default function RequestsFeed() {
               <div className="flex justify-between items-center border-t border-zinc-800/50 pt-4">
         
                 <button
-  onClick={() => acceptRequest(req.id, req.user_id)}
-  className="bg-white text-black px-6 py-2.5 rounded-2xl font-black text-sm hover:bg-green-500 transition-all flex items-center gap-2 active:scale-90"
+  onClick={(e) => {
+    e.preventDefault();
+    acceptRequest(req.id, req.user_id)}
+  }
+    className="bg-white text-black px-6 py-2.5 rounded-2xl font-black text-sm hover:bg-green-500 transition-all flex items-center gap-2 active:scale-90"
 >
   <MessageCircle size={18} /> قبول الطلب
 </button>
