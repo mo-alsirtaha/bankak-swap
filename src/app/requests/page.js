@@ -203,8 +203,8 @@ export default function RequestsFeed() {
         {/* التعليق اليدوي */}
   {req.comment && (
     <div className="bg-black/40 border-r-4 border-orange-500 px-3 py-2 my-4 rounded-lg">
-       <p className="text-[11px] text-zinc-300 text-right leading-tight font-medium italic">
-          "{req.comment}"
+       <p className="text-[14px] text-zinc-300 text-right leading-tight font-medium italic">
+          {req.comment}
        </p>
     </div>
   )}
