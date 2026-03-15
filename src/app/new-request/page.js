@@ -50,7 +50,7 @@ export default function NewRequest() {
       );
     });
   };
-
+  const [comment, setComment] = useState('') // 1. إضافة حالة للتعليق
   const handleSubmit = async (type) => {
     if (!amount || amount <= 0) {
       alert("الرجاء إدخال مبلغ صحيح");
@@ -76,6 +76,7 @@ export default function NewRequest() {
         user_id: user.id,
         type: type, 
         amount: parseFloat(amount),
+        comment: comment, // ارسال التعليق هنا 
         city: userProfile?.city || 'أم درمان', 
         lat: currentLat, // إرسال خط العرض هنا
         lng: currentLng, // إرسال خط الطول هنا
@@ -113,7 +114,17 @@ export default function NewRequest() {
             className="w-full bg-transparent text-center text-5xl font-black font-mono outline-none text-white placeholder:text-zinc-800"
           />
         </div>
-       
+       {/* 3. حقل التعليق الجديد - مستطيل صغير */}
+        <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl px-4 py-2">
+          <input 
+            type="text"
+            placeholder="أضف الوصف موقع الحي الشارع (معلم بارز)..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            maxLength={50}
+            className="w-full bg-transparent text-right text-xs outline-none text-zinc-300 placeholder:text-zinc-600 font-medium"
+          />
+        </div>
        <p className="text-[10px] text-zinc-500 text-center px-4">
   بضغطك على أزرار التبادل، أنت توافق على <a href="/terms" className="text-orange-500 underline">شروط الاستخدام</a> وتقر بأن التطبيق وسيط لا يتحمل مسؤولية التبادل المالي.
 </p>
