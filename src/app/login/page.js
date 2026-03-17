@@ -77,7 +77,7 @@ useEffect(() => {
         if (authData.user) {
           await supabase.from('profiles').upsert({ id: authData.user.id, verified: false })
           showAlert("مبروك!", "تم إنشاء حسابك بنجاح، جاري توجيهك للبروفايل.", "success");
-          setTimeout(() => router.push('/profile'), 2000);
+          setTimeout(() => router.push('/requests'), 2000);
         }
       }
     } catch (err) {

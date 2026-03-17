@@ -74,7 +74,7 @@ export default function MyRequests() {
               {/* زر الحذف - يظهر بوضوح وسهل اللمس في الموبايل */}
               <button 
                 onClick={() => handleDelete(req.id)}
-                className="absolute top-4 left-4 p-3 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                className="absolute top-16 left-4 p-3 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all active:scale-90"
                 title="حذف الطلب"
               >
                 <Trash2 size={20} />

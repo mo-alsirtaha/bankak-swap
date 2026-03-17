@@ -158,7 +158,7 @@ return (
     {/* الأزرار في الأسفل تماماً */}
     <div className="max-w-md mx-auto w-full space-y-2 pb-6">
   <button 
-    onClick={saved ? () => router.push('/verify-waiting') : updateProfile}
+    onClick={saved ? () => router.push('/requests') : updateProfile}
     disabled={loading}
     className={`w-full text-black font-black py-4 rounded-xl flex items-center justify-center gap-2 text-sm active:scale-95 shadow-lg transition-colors duration-300 ${
       saved ? 'bg-green-500 hover:bg-green-600' : 'bg-orange-500 hover:bg-orange-600'
