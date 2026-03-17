@@ -26,7 +26,7 @@ export default function WelcomePage() {
         <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-3xl">
           <Zap className="text-orange-500 mb-2" size={20} />
           <h3 className="font-bold text-sm">سرعة البرق</h3>
-          <p className="text-[10px] text-zinc-500">تواصل فوري عبر واتساب</p>
+          <p className="text-[10px] text-zinc-500">تواصل فوري عبر الدردشة</p>
         </div>
         <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-3xl">
           <MapPin className="text-green-500 mb-2" size={20} />
