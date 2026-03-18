@@ -107,7 +107,7 @@ setShowSuccessModal(true)
     <div className="min-h-screen bg-black text-white p-6 pb-20">
       <div className="max-w-md mx-auto pt-12 space-y-8">
         <header className="text-right">
-          <h1 className="text-3xl font-black text-orange-500 underline decoration-zinc-800 underline-offset-8 uppercase italic">Mishcat Swap</h1>
+          <h1 className="text-3xl font-black text-orange-500 underline decoration-zinc-800 underline-offset-8 uppercase italic">Bankak Swap</h1>
           <p className="text-zinc-500 mt-2 font-medium">نظام التبادل الذكي في السودان</p>
         </header>
 
