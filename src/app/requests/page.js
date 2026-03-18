@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PWAInstall from '@/components/PWAInstall';
 import NotificationSetup from '@/components/NotificationSetup'
+import LocationPermissionOverlay from '@/components/LocationPermissionOverlay'
 
 const CITIES = ["الخرطوم", "أم درمان", "بحرى", "بورتسودان", "كسلا", "عطبرة", "ود مدني", "دنقلا"]
 
@@ -115,6 +116,7 @@ export default function RequestsFeed() {
   return (
     <div className="min-h-screen bg-black text-white p-4 pb-32">
       
+  
       {/* 3. التنبيه يظهر هنا في الأعلى */}
       {showProfileReminder && (
         <div className="mb-6 animate-in slide-in-from-top duration-500">
@@ -132,7 +134,7 @@ export default function RequestsFeed() {
           </Link>
         </div>
       )}
-
+    <LocationPermissionOverlay/>
       {/* التبويبات العلوية */}
       <div className="flex bg-zinc-900 p-1 rounded-2xl mb-6 border border-zinc-800">
         <button onClick={() => setFilterType('gps')} className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${filterType === 'gps' ? 'bg-orange-500 text-black font-bold' : 'text-zinc-500'}`}>
@@ -142,7 +144,7 @@ export default function RequestsFeed() {
           <Building2 size={18}/> بالمدينة
         </button>
       </div>
-
+  
       <NotificationSetup />
       <PWAInstall />
 
