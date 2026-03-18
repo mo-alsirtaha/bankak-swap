@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import PWAInstall from '@/components/PWAInstall';
 import NotificationSetup from '@/components/NotificationSetup'
 import LocationPermissionOverlay from '@/components/LocationPermissionOverlay'
+import FeedbackModal from '@/components/FeedbackModal'
 
 const CITIES = ["الخرطوم", "أم درمان", "بحرى", "بورتسودان", "كسلا", "عطبرة", "ود مدني", "دنقلا"]
 
@@ -17,6 +18,7 @@ export default function RequestsFeed() {
   const [loading, setLoading] = useState(false)
   const [showProfileReminder, setShowProfileReminder] = useState(false) // حالة التنبيه
   const router = useRouter();
+  const [showFeedback, setShowFeedback] = useState(false)
 
   // 1. دالة التحقق من اكتمال الملف الشخصي
   const checkProfileStatus = async () => {
@@ -87,6 +89,65 @@ export default function RequestsFeed() {
       setLoading(false)
     }
   }
+
+  //مكون التقيم
+
+  useEffect(() => {
+    const now = Date.now()
+
+    const FIRST_USE_KEY = 'feedback_first_use_at'
+    const LAST_SHOWN_KEY = 'feedback_last_shown'
+    const LAST_ACTION_KEY = 'feedback_last_action'
+
+    const FIRST_SHOW_DELAY = 24 * 60 * 60 *1000      // 24 ساعة
+    const SKIP_DELAY = 72 * 60 * 60 * 1000            // 72 ساعة
+    const SUBMIT_DELAY = 7 * 24 * 60 * 60 * 1000      // 7 أيام
+
+    let firstUseAt = localStorage.getItem(FIRST_USE_KEY)
+    const lastShown = localStorage.getItem(LAST_SHOWN_KEY)
+    const lastAction = localStorage.getItem(LAST_ACTION_KEY)
+
+    // أول دخول للتطبيق
+    if (!firstUseAt) {
+      localStorage.setItem(FIRST_USE_KEY, now.toString())
+      firstUseAt = now.toString()
+    }
+
+    let shouldShow = false
+
+    // أول مرة: بعد 24 ساعة من أول استخدام
+    if (!lastShown) {
+      if (now - Number(firstUseAt) >= FIRST_SHOW_DELAY) {
+        shouldShow = true
+      }
+    } else {
+      // إذا كان آخر إجراء = إرسال
+      if (lastAction === 'submitted') {
+        if (now - Number(lastShown) >= SUBMIT_DELAY) {
+          shouldShow = true
+        }
+      }
+      // إذا كان آخر إجراء = لاحقًا / إغلاق
+      else {
+        if (now - Number(lastShown) >= SKIP_DELAY) {
+          shouldShow = true
+        }
+      }
+    }
+
+    if (shouldShow) {
+      const timer = setTimeout(() => {
+        setShowFeedback(true)
+      }, 4000) // يظهر بعد 4 ثواني من فتح الصفحة
+
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  
+
+      
+
 
   useEffect(() => {
     fetchRequests()
@@ -211,6 +272,10 @@ export default function RequestsFeed() {
       <Link href="/new-request" className="fixed bottom-28 left-6 bg-orange-500 p-4 rounded-full shadow-2xl text-black z-50 animate-bounce">
         <PlusCircle size={32} />
       </Link>
+   <FeedbackModal
+  isOpen={showFeedback}
+  onClose={() => setShowFeedback(false)}
+/>
     </div>
   )
 }
