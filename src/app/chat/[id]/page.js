@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Send, Phone, ArrowRight, User } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
+import NotificationSetup from "@/components/NotificationSetup";
+import ClientOnly from "@/components/ClientOnly";
 
 export default function ChatPage() {
   const { id: chatId } = useParams()
@@ -172,7 +174,7 @@ export default function ChatPage() {
       <div className="bg-orange-500/10 p-2 text-[9px] text-orange-500 text-center font-bold">
         تنبيه: لا تقم بتحويل الأموال إلا عند المقابلة الشخصية والتأكد من استلام الكاش.
       </div>
-
+<NotificationSetup />
       <div className="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between shadow-xl">
         <button onClick={() => router.back()} className="text-zinc-400 hover:text-white">
           <ArrowRight size={24} />
