@@ -5,7 +5,6 @@ import { MapPin, Navigation, Building2, Search, PlusCircle, MessageCircle, Alert
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PWAInstall from '@/components/PWAInstall';
-import NotificationSetup from '@/components/NotificationSetup'
 import LocationPermissionOverlay from '@/components/LocationPermissionOverlay'
 import FeedbackModal from '@/components/FeedbackModal'
 
@@ -206,7 +205,7 @@ export default function RequestsFeed() {
         </button>
       </div>
   
-      <NotificationSetup />
+    
       <PWAInstall />
 
       {/* اختيارات المدينة */}
