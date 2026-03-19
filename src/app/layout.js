@@ -2,8 +2,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
-
-
+import LocationPermissionOverlay from "@/components/LocationPermissionOverlay"
+import ClientOnly from "@/components/ClientOnly"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,8 +30,12 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} bg-black text-white min-h-screen overflow-x-hidden pb-28`}
       >
         <main className="max-w-md mx-auto w-full px-4">
-             
           {children}
+         
+           <ClientOnly/>
+             <LocationPermissionOverlay/>
+         <ClientOnly/>
+          
         </main>
      
         <BottomNav />

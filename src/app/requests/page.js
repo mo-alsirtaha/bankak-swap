@@ -194,7 +194,7 @@ export default function RequestsFeed() {
           </Link>
         </div>
       )}
-    <LocationPermissionOverlay/>
+    
       {/* التبويبات العلوية */}
       <div className="flex bg-zinc-900 p-1 rounded-2xl mb-6 border border-zinc-800">
         <button onClick={() => setFilterType('gps')} className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${filterType === 'gps' ? 'bg-orange-500 text-black font-bold' : 'text-zinc-500'}`}>
